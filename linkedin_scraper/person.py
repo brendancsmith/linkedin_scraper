@@ -1,4 +1,3 @@
-import requests
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -6,12 +5,11 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
 from .objects import Experience, Education, Scraper, Interest, Accomplishment, Contact
 import os
-from linkedin_scraper import selectors
 
 
 class Person(Scraper):
 
-    __TOP_CARD = "pv-top-card"
+    __TOP_CARD = "scaffold-layout__main"
     __WAIT_FOR_ELEMENT_TIMEOUT = 5
 
     def __init__(
@@ -115,7 +113,7 @@ class Person(Scraper):
         self.scroll_to_bottom()
         main_list = self.wait_for_element_to_load(name="pvs-list", base=main)
         for position in main_list.find_elements(By.XPATH,"li"):
-            position = position.find_element(By.CLASS_NAME,"pvs-entity")
+            position = position.find_element(By.CLASS_NAME,"pvs-entity--padded")
             company_logo_elem, position_details = position.find_elements(By.XPATH,"*")
 
             # company elem
@@ -240,9 +238,9 @@ class Person(Scraper):
             self.add_education(education)
 
     def get_name_and_location(self):
-        top_panels = self.driver.find_elements(By.CLASS_NAME,"pv-text-details__left-panel")
-        self.name = top_panels[0].find_elements(By.XPATH,"*")[0].text
-        self.location = top_panels[1].find_element(By.TAG_NAME,"span").text
+        top_panel = self.driver.find_element(By.XPATH, "//*[@class='mt2 relative']")
+        self.name = top_panel.find_element(By.TAG_NAME, "h1").text
+        self.location = top_panel.find_element(By.XPATH, "//*[@class='text-body-small inline t-black--light break-words']").text
 
 
     def get_about(self):
